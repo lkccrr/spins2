@@ -3,16 +3,16 @@ import numpy as np
 from numba import njit, prange
 from spins2 import functions
 
-def iteration3(latt, X_s, Y_s, Jh, Jv, J0, J1, val, nequilibrium, nworks):
+def iteration3(latt, X_s, Y_s, Ja, J0, Jv, Jh, val, nequilibrium, nworks):
     Nw = np.zeros((nworks, 8))
     Ew = np.zeros(nworks)
     t0 = time.time()
     for i in range(nequilibrium):
         randvals = np.random.rand(2, 2, 2, Y_s, X_s)
-        E0 = update3(latt, randvals, X_s, Y_s, Jh, Jv, J0, J1, val)
+        E0 = update3(latt, randvals, X_s, Y_s, Ja, J0, Jv, Jh, val)
     for i in range(nworks):
         randvals = np.random.rand(2, 2, 2, Y_s, X_s)
-        E0 = update3(latt, randvals, X_s, Y_s, Jh, Jv, J0, J1, val)
+        E0 = update3(latt, randvals, X_s, Y_s, Ja, J0, Jv, Jh, val)
         Ew[i] = E0 / 2
         Nw[i] = functions.Average(latt[0,0,0]), functions.Average(latt[0,1,0]), functions.Average(latt[0,0,1]), functions.Average(latt[0,1,1]),\
                 functions.Average(latt[1,0,0]), functions.Average(latt[1,1,0]), functions.Average(latt[1,0,1]), functions.Average(latt[1,1,1])
@@ -20,7 +20,7 @@ def iteration3(latt, X_s, Y_s, Jh, Jv, J0, J1, val, nequilibrium, nworks):
     return t, Nw, Ew
 
 @njit(cache=True, parallel=True)
-def update3(latt, randvals, X_s, Y_s, Jh, Jv, J0, J1, val):
+def update3(latt, randvals, X_s, Y_s, Ja, J0, Jv, Jh, val):
     nn_sum = 0
     for h in prange(2):
         for g in range(2):
@@ -70,16 +70,15 @@ def update3(latt, randvals, X_s, Y_s, Jh, Jv, J0, J1, val):
                                 x_1 = i   if g == 0 else ipp
                                 y_2 = j
 
-                        energy  = ( -Jh * ( latt[h ,go,f ,j  ,i  ] + latt[h ,go,f ,j  ,hx0] ) -
-
-                                     Jv * ( latt[h ,g ,fo,j  ,i  ] + latt[h ,g ,fo,vy0,i  ] +
+                        energy  = ( -Ja * ( latt[h ,go,f ,j  ,i  ] + latt[h ,go,f ,j  ,hx0] +
+                                            latt[h ,g ,fo,j  ,i  ] + latt[h ,g ,fo,vy0,i  ] +
                                             latt[h ,go,fo,j  ,vx0] + latt[h ,go,fo,vy0,vx0] ) -
 
                                      J0 * ( latt[ho,g ,f ,j  ,i  ] + latt[ho,go,f ,j  ,x_0] +
                                             latt[ho,gp,fo,y_0,i  ] ) -
 
-                                     J1 * ( latt[ho,gp,fo,y_1,x_1] +
-                                            latt[ho,go,fo,y_2,i  ] + latt[ho,go,fo,y_2,hx0] ) )
+                                     Jv *   latt[ho,gp,fo,y_1,x_1] -
+                                     Jh * ( latt[ho,go,fo,y_2,i  ] + latt[ho,go,fo,y_2,hx0] ) )
                         energy *= latt[h,g,f,j,i]
 
                         if val == 0:

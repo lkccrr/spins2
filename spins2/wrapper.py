@@ -6,7 +6,7 @@ def main():
     parser = argparse.ArgumentParser(description='spins2: A Monte Carlo Simulation Code for the Phase Transition in 2D/3D Materials',
                                      epilog='''
 configurations:       init:                             parameters:         model:
-bilayer-ab            fm, afm1, afm2, afm3, afm4        Jh, Jv, J0, J1      ising, single, mae
+bilayer-ab            fm, afm1, afm2, afm3, afm4        Ja, J0, Jh, Jv      ising, single, mae
 
 default values:
 x, y, z = 64, 64, 64
@@ -16,7 +16,7 @@ single-ion anisotropy (meV) = 0.1
 temperatures = 0 15 5 16 60
 
 Example:
-spin -n 4 -x 100 -y 100 -e 200 -w 1000 -n 2 -t 35 -r
+spins2 -n 4 -x 100 -y 100 -e 200 -w 1000 -n 2 -t 35 -r
 ''',
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('-v', "--version", action="version", version="spins2 "+__version__+" from "+os.path.dirname(__file__)+' (python'+platform.python_version()+')')

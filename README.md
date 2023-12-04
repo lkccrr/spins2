@@ -8,7 +8,7 @@
 
 ### spins2
 
-The <b style="color:green;"><i>spins2</b></i> is A Monte Carlo Simulation Code for the Phase Transition in 2D/3D Materials.
+The <b style="color:green;"><i>spins2</b></i> is a Monte Carlo simulation code for the phase transition in 2D/3D magnetic materials.
 ***
 <b style="color:blue;"><i>spins2</b></i>
 * To execute <b style="color:blue;"><i>spins2</b></i> <b style="color:red;"><i>\-h</b></i> for the parameters to use.

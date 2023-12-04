@@ -11,7 +11,7 @@ setup(
     license_files=('LICENSE.txt',),
     platforms=['Unix', 'Windows'],
     keywords='Monte Carlo Simulation Ising Model',
-    description='spins2: A Monte Carlo Simulation Code for the Phase Transition in 2D/3D Materials',
+    description='A Monte Carlo Simulation Code for the Phase Transition in 2D/3D Magnetic Materials.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/lkccrr/spins2',
