@@ -5,8 +5,8 @@ from spins2 import __version__
 def main():
     parser = argparse.ArgumentParser(description='spins2: A Monte Carlo Simulation Code for the Phase Transition in 2D/3D Materials',
                                      epilog='''
-configurations:       init:                             parameters:         model:
-bilayer-ab            fm, afm1, afm2, afm3, afm4        Ja, J0, Jh, Jv      ising, single, mae
+configurations:       init:                             parameters:           model:
+bilayer-ab            fm, afm1, afm2, afm3, afm4        J0, J1, Ja, J_1, J_a  ising, single, mae
 
 default values:
 x, y, z = 64, 64, 64

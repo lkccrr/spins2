@@ -33,9 +33,24 @@ def NormalrandNN(n, m, Y, X):
             arr[i,j] = arr_t.T
     return arr
 
+def NormalrandNNN(o, n, m, Y, X):
+    arr = np.zeros((o, n, m, Y, X, 3)).astype(np.float32)
+    for k in range(o):
+        for i in range(n):
+            for j in range(m):
+                arr_t = np.random.randn(3, X, Y)
+                arr_t = arr_t / np.sqrt(arr_t[0]**2 + arr_t[1]**2 + arr_t[2]**2)
+                arr[k,i,j] = arr_t.T
+    return arr
+
 def OnesZNN(n, m, Y, X):
     arr = np.zeros((n, m, Y, X, 3)).astype(np.float32)
     arr[:,:,:,:,2] = 1
+    return arr
+
+def OnesZNNN(n, m, Z, Y, X):
+    arr = np.zeros((n, m, Z, Y, X, 3)).astype(np.float32)
+    arr[:,:,:,:,:,2] = 1
     return arr
 
 def sigmaNN(n, m, Y, X, sigma, latt):
@@ -48,4 +63,13 @@ def sigmaNN(n, m, Y, X, sigma, latt):
             arr[i,j] = arr_S.T
     return arr
 
-
+def sigmaNNN(o, n, m, Y, X, sigma, latt):
+    arr = np.zeros((o, n, m, Y, X, 3)).astype(np.float32)
+    for k in range(o):
+        for i in range(n):
+            for j in range(m):
+                arr_S = np.random.randn(3, X, Y)
+                arr_S = latt[k,i,j].T + sigma * arr_S
+                arr_S = arr_S / np.sqrt(arr_S[0]**2 + arr_S[1]**2 + arr_S[2]**2)
+                arr[k,i,j] = arr_S.T
+    return arr
