@@ -4,9 +4,9 @@ from numba import njit, prange
 from spins2 import functions
 
 def iteration3(latt, X_s, Y_s, J0, J1, Ja, J_1, J_a, val, nequilibrium, nworks):
+    t0 = time.time()
     Nw = np.zeros((nworks, 8))
     Ew = np.zeros(nworks)
-    t0 = time.time()
     for i in range(nequilibrium):
         randvals = np.random.rand(2, 2, 2, Y_s, X_s)
         E0 = update3(latt, randvals, X_s, Y_s, J0, J1, Ja, J_1, J_a, val)

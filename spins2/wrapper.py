@@ -6,26 +6,26 @@ def main():
     parser = argparse.ArgumentParser(description='spins2: A Monte Carlo Simulation Code for the Phase Transition in 2D/3D Materials',
                                      epilog='''
 configurations:       init:                             parameters:           model:
-bilayer-ab            fm, afm1, afm2, afm3, afm4        J0, J1, Ja, J_1, J_a  ising, single, mae
+bilayer-ab            fm, afm1, afm2, afm3, afm4, afm5  J0, J1, Ja, J_1, J_a  ising, single
 
 default values:
-x, y, z = 64, 64, 64
-iterations for equilibrium, works = 64, 64
+x, y, z = 200, 200, 200
+iterations for equilibrium, works = 100, 1000
 exchange coupling (meV) = 1.0
 single-ion anisotropy (meV) = 0.1
 temperatures = 0 15 5 16 60
 
 Example:
-spins2 -n 4 -x 100 -y 100 -e 200 -w 1000 -n 2 -t 35 -r
+spins2 -x 100 -y 100 -e 200 -w 1000 -n 2 -t 35 -r
 ''',
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('-v', "--version", action="version", version="spins2 "+__version__+" from "+os.path.dirname(__file__)+' (python'+platform.python_version()+')')
-    parser.add_argument('-n', "--np",           type=int,   default=4 )
-    parser.add_argument('-x', "--length",       type=int,   default=64)
-    parser.add_argument('-y', "--width",        type=int,   default=64)
-    parser.add_argument('-z', "--height",       type=int,   default=64)
-    parser.add_argument('-e', "--equilibrium",  type=int,   default=64)
-    parser.add_argument('-w', "--works",        type=int,   default=64)
+    parser.add_argument('-n', "--np",           type=int,   default=4   )
+    parser.add_argument('-x', "--length",       type=int,   default=200 )
+    parser.add_argument('-y', "--width",        type=int,   default=200 )
+    parser.add_argument('-z', "--height",       type=int,   default=200 )
+    parser.add_argument('-e', "--equilibrium",  type=int,   default=100 )
+    parser.add_argument('-w', "--works",        type=int,   default=1000)
     parser.add_argument('-a', "--single",       type=float, default=[0.1], nargs='+')
     parser.add_argument('-p', "--parameters",   type=float, default=[1.0], nargs='+')
     parser.add_argument('-j', "--parametersX",  type=float, default=[], nargs='+')
