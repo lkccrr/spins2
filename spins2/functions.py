@@ -60,3 +60,4 @@ def OnesZNNN(n, m, Z, Y, X):
     arr = np.zeros((n, m, Z, Y, X, 3)).astype(np.float32)
     arr[:,:,:,:,:,2] = 1
     return arr
+

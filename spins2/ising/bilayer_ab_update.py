@@ -28,10 +28,10 @@ def update3(latt, randvals, X_s, Y_s, J0, J1, Ja, J_1, J_a, val):
         for g in range(2):
             for j in range(Y_s):
                 for i in range(X_s):
-                    ipp  = (i + 1)  if (i + 1) < X_s else 0
-                    inn  = (i - 1)  if (i - 1) > -1  else (X_s - 1)
-                    jpp  = (j + 1)  if (j + 1) < Y_s else 0
-                    jnn  = (j - 1)  if (j - 1) > -1  else (Y_s - 1)
+                    ipp  = (i + 1) if (i + 1) < X_s else 0
+                    inn  = (i - 1) if (i - 1) > -1  else (X_s - 1)
+                    jpp  = (j + 1) if (j + 1) < Y_s else 0
+                    jnn  = (j - 1) if (j - 1) > -1  else (Y_s - 1)
                     go   = 1  - g
                     f_4  = f  % 4
                     f_2  = f  % 2
@@ -47,9 +47,9 @@ def update3(latt, randvals, X_s, Y_s, J0, J1, Ja, J_1, J_a, val):
                         x__a = i if f_2 == 0 else ipp
                         x__b = i
 
-                    f1 = f0 + 4  if f0       < 4   else f0 - 4
-                    f2 = f1 - 1  if f1 % 2  == 1   else f1 + 1
-                    f3 = f0 - 1  if f0 % 2  == 1   else f0 + 1
+                    f1 = f0 + 4 if f0      < 4 else f0 - 4
+                    f2 = f1 - 1 if f1 % 2 == 1 else f1 + 1
+                    f3 = f0 - 1 if f0 % 2 == 1 else f0 + 1
 
                     if f_2 == 0:
                         fp   = f + 1

@@ -9,35 +9,35 @@ configurations:       init:                             parameters:           mo
 bilayer-ab            fm, afm1, afm2, afm3, afm4, afm5  J0, J1, Ja, J_1, J_a  ising, single
 
 default values:
-x, y, z = 200, 200, 200
-iterations for equilibrium, works = 100, 1000
+x, y, z = 150, 150, 150
+iterations for equilibrium, works = 1000, 1000
 exchange coupling (meV) = 1.0
 single-ion anisotropy (meV) = 0.1
 temperatures = 0 15 5 16 60
 
 Example:
-spins2 -x 100 -y 100 -e 200 -w 1000 -n 2 -t 35 -r
+spins2 -x 100 -y 100 -e 200 -w 1000 -n 8 -t 35 -r
 ''',
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('-v', "--version", action="version", version="spins2 "+__version__+" from "+os.path.dirname(__file__)+' (python'+platform.python_version()+')')
     parser.add_argument('-n', "--np",           type=int,   default=8   )
-    parser.add_argument('-x', "--length",       type=int,   default=200 )
-    parser.add_argument('-y', "--width",        type=int,   default=200 )
-    parser.add_argument('-z', "--height",       type=int,   default=200 )
-    parser.add_argument('-e', "--equilibrium",  type=int,   default=100 )
+    parser.add_argument('-x', "--length",       type=int,   default=150 )
+    parser.add_argument('-y', "--width",        type=int,   default=150 )
+    parser.add_argument('-z', "--height",       type=int,   default=150 )
+    parser.add_argument('-e', "--equilibrium",  type=int,   default=1000)
     parser.add_argument('-w', "--works",        type=int,   default=1000)
     parser.add_argument('-a', "--single",       type=float, default=[0.1], nargs='+')
     parser.add_argument('-p', "--parameters",   type=float, default=[1.0], nargs='+')
-    parser.add_argument('-j', "--parametersX",  type=float, default=[], nargs='+')
-    parser.add_argument('-k', "--parametersY",  type=float, default=[], nargs='+')
-    parser.add_argument('-t', "--temperatures", type=float, default=[0, 15, 5, 16, 60], nargs='+')
-    parser.add_argument('-l', "--label",        type=str,   default='', help='label of the figures')
-    parser.add_argument('-r', "--export", action='store_true', help="plot figures after iterations")
-    parser.add_argument('-o', "--plot",   type=str, help="plot figures from .log file")
-    parser.add_argument('-f', "--format", default="png",        type=str.lower, choices=['png', 'pdf', 'svg', 'jpg', 'tif'])
-    parser.add_argument('-m', "--model",  default="ising",      type=str.lower, choices=['ising', 'single', 'mae'])
-    parser.add_argument('-i', "--init",   default="fm",         type=str.lower, choices=['fm', 'afm1', 'afm2','afm3', 'afm4', 'afm5', 'random'])
-    parser.add_argument('-c', "--config", default="bilayer-ab", type=str.lower, choices=['bilayer-ab'])
+    parser.add_argument('-j', "--parametersX",  type=float, default=[],    nargs='+')
+    parser.add_argument('-k', "--parametersY",  type=float, default=[],    nargs='+')
+    parser.add_argument('-t', "--temperatures", type=float, default=[25],  nargs='+')
+    parser.add_argument('-l', "--label",        type=str,   default='',    help='label of the figures')
+    parser.add_argument('-r', "--export",       action='store_true',       help="plot figures after iterations")
+    parser.add_argument('-o', "--plot",         type=str,   help="plot figures from .log file")
+    parser.add_argument('-f', "--format",       default="png",             type=str.lower, choices=['png', 'pdf', 'svg', 'jpg', 'tif'])
+    parser.add_argument('-m', "--model",        default="ising",           type=str.lower, choices=['ising', 'single', 'mae'])
+    parser.add_argument('-i', "--init",         default="fm",              type=str.lower, choices=['fm', 'afm1', 'afm2','afm3', 'afm4', 'afm5', 'random'])
+    parser.add_argument('-c', "--config",       default="bilayer-ab",      type=str.lower, choices=['bilayer-ab'])
     args = parser.parse_args()
 
     NP = args.np

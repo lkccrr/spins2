@@ -15,7 +15,7 @@ The <b style="color:green;"><i>spins2</b></i> is a Monte Carlo simulation code f
 * Example:
 ```bash
 spins2 -h
-spins2 -n 4 -x 200 -y 200 -e 200 -w 1000 -t 35 -r
-spins2 -x 200 -y 200 -t 0 32 4 33 40 1 40.2 45 0.2 46 55 1 -e 200 -w 1000 -r
+spins2 -n 4 -x 100 -y 100 -e 200 -w 1000 -t 35 -r
+spins2 -x 100 -y 100 -t 0 32 4 33 40 1 40.2 45 0.2 46 55 1 -e 200 -w 1000 -r
 ```
 
