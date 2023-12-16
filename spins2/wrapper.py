@@ -20,7 +20,7 @@ spins2 -x 100 -y 100 -e 200 -w 1000 -n 2 -t 35 -r
 ''',
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('-v', "--version", action="version", version="spins2 "+__version__+" from "+os.path.dirname(__file__)+' (python'+platform.python_version()+')')
-    parser.add_argument('-n', "--np",           type=int,   default=4   )
+    parser.add_argument('-n', "--np",           type=int,   default=8   )
     parser.add_argument('-x', "--length",       type=int,   default=200 )
     parser.add_argument('-y', "--width",        type=int,   default=200 )
     parser.add_argument('-z', "--height",       type=int,   default=200 )
@@ -99,6 +99,8 @@ def check(num):
         num += 1
     if num % 4 != 0:
         num += 2
+#    if num % 8 != 0:
+#        num += 4
     return num
 
 def temperatures(arr_temperatures):

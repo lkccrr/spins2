@@ -6,6 +6,9 @@ def Average(arr):
 def Average2(arr):
     return np.sum(arr**2) / arr.size
 
+def Onesint3(m, Y, X):
+    return np.ones((m, Y, X)).astype(np.int8)
+
 def Onesint4(n, m, Y, X):
     return np.ones((n, m, Y, X)).astype(np.int8)
 
@@ -41,6 +44,11 @@ def NormalrandNNN(o, n, m, Y, X):
                 arr_t = np.random.randn(3, X, Y)
                 arr_t = arr_t / np.sqrt(arr_t[0]**2 + arr_t[1]**2 + arr_t[2]**2)
                 arr[k,i,j] = arr_t.T
+    return arr
+
+def OnesZN(m, Y, X):
+    arr = np.zeros((m, Y, X, 3)).astype(np.float32)
+    arr[:,:,:,2] = 1
     return arr
 
 def OnesZNN(n, m, Y, X):
