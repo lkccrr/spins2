@@ -5,7 +5,7 @@ from spins2 import functions
 
 def iteration3(latt, X_s, Y_s, J0, J1, Ja, J_1, J_a, Aa, Ab, val, nequilibrium, nworks):
     t0 = time.time()
-    Ns = np.zeros((nworks, 2, 8))
+    Nw = np.zeros((nworks, 2, 8))
     Ew = np.zeros(nworks)
     for i in range(nequilibrium):
         laRn = functions.NormalrandNN(2, 8, Y_s, X_s)
@@ -20,12 +20,12 @@ def iteration3(latt, X_s, Y_s, J0, J1, Ja, J_1, J_a, Aa, Ab, val, nequilibrium, 
         laRZ = energy_A(laRn, Aa, Ab)
         E0   = update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, J_1, J_a, val)
         Ew[i] = E0 / 2.0
-        Ns[i,0] = functions.Average(np.sign(latt[0,0,:,:,2])), functions.Average(np.sign(latt[0,1,:,:,2])), functions.Average(np.sign(latt[0,2,:,:,2])), functions.Average(np.sign(latt[0,3,:,:,2])),\
+        Nw[i,0] = functions.Average(np.sign(latt[0,0,:,:,2])), functions.Average(np.sign(latt[0,1,:,:,2])), functions.Average(np.sign(latt[0,2,:,:,2])), functions.Average(np.sign(latt[0,3,:,:,2])),\
                   functions.Average(np.sign(latt[0,4,:,:,2])), functions.Average(np.sign(latt[0,5,:,:,2])), functions.Average(np.sign(latt[0,6,:,:,2])), functions.Average(np.sign(latt[0,7,:,:,2]))
-        Ns[i,1] = functions.Average(np.sign(latt[1,0,:,:,2])), functions.Average(np.sign(latt[1,1,:,:,2])), functions.Average(np.sign(latt[1,2,:,:,2])), functions.Average(np.sign(latt[1,3,:,:,2])),\
+        Nw[i,1] = functions.Average(np.sign(latt[1,0,:,:,2])), functions.Average(np.sign(latt[1,1,:,:,2])), functions.Average(np.sign(latt[1,2,:,:,2])), functions.Average(np.sign(latt[1,3,:,:,2])),\
                   functions.Average(np.sign(latt[1,4,:,:,2])), functions.Average(np.sign(latt[1,5,:,:,2])), functions.Average(np.sign(latt[1,6,:,:,2])), functions.Average(np.sign(latt[1,7,:,:,2]))
     t = time.time() - t0
-    return t, Ns, Ew
+    return t, Nw, Ew
 
 def energy_A(latt, Aa, Ab):
     latt_2 = latt ** 2
