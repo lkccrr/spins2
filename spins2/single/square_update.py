@@ -20,10 +20,10 @@ def iteration3(latt, X_s, Y_s, Ja, Jb, Jc, Aa, Ab, val, nequilibrium, nworks):
         laRZ = energy_A(laRn, Aa, Ab)
         E0   = update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, Ja, Jb, Jc, val)
         Ew[i] = E0 / 2.0
-        Nw[i,0] = functions.Average(np.sign(latt[0,0,:,:,2])), functions.Average(np.sign(latt[0,1,:,:,2])), functions.Average(np.sign(latt[0,2,:,:,2])), functions.Average(np.sign(latt[0,3,:,:,2])),\
-                  functions.Average(np.sign(latt[0,4,:,:,2])), functions.Average(np.sign(latt[0,5,:,:,2])), functions.Average(np.sign(latt[0,6,:,:,2])), functions.Average(np.sign(latt[0,7,:,:,2]))
-        Nw[i,1] = functions.Average(np.sign(latt[1,0,:,:,2])), functions.Average(np.sign(latt[1,1,:,:,2])), functions.Average(np.sign(latt[1,2,:,:,2])), functions.Average(np.sign(latt[1,3,:,:,2])),\
-                  functions.Average(np.sign(latt[1,4,:,:,2])), functions.Average(np.sign(latt[1,5,:,:,2])), functions.Average(np.sign(latt[1,6,:,:,2])), functions.Average(np.sign(latt[1,7,:,:,2]))
+        Nw[i,0] = functions.Average(latt[0,0,:,:,2]), functions.Average(latt[0,1,:,:,2]), functions.Average(latt[0,2,:,:,2]), functions.Average(latt[0,3,:,:,2]),\
+                  functions.Average(latt[0,4,:,:,2]), functions.Average(latt[0,5,:,:,2]), functions.Average(latt[0,6,:,:,2]), functions.Average(latt[0,7,:,:,2])
+        Nw[i,1] = functions.Average(latt[1,0,:,:,2]), functions.Average(latt[1,1,:,:,2]), functions.Average(latt[1,2,:,:,2]), functions.Average(latt[1,3,:,:,2]),\
+                  functions.Average(latt[1,4,:,:,2]), functions.Average(latt[1,5,:,:,2]), functions.Average(latt[1,6,:,:,2]), functions.Average(latt[1,7,:,:,2])
     t = time.time() - t0
     return t, Nw, Ew
 
@@ -131,38 +131,35 @@ def update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, Ja, Jb, Jc, val):
                                  Jb * ( latt[ga,f0,y__u,x__a,2] + latt[ga,f1,y__d,x__a,2] + latt[gb,f0,y__u,x__b,2] + latt[gb,f1,y__d,x__b,2] ) -
                                  Jc * ( latt[go,f ,j   ,x__o,2] + latt[go,f ,j   ,x__p,2] + latt[g ,fq,y__q,i   ,2] + latt[g ,fr,y__r,i   ,2] )
                               )
-
-                    energy  = energy0 * latt[g,f,j,i,0] + energy1 * latt[g,f,j,i,1] + energy2 * latt[g,f,j,i,2]
-                    Erandn  = energy0 * laRn[g,f,j,i,0] + energy1 * laRn[g,f,j,i,1] + energy2 * laRn[g,f,j,i,2]
+                    e0 = energy0 * latt[g,f,j,i,0]
+                    e1 = energy1 * latt[g,f,j,i,1]
+                    e2 = energy2 * latt[g,f,j,i,2]
 
                     ez = latZ[g,f,j,i]
                     Ez = laRZ[g,f,j,i]
+
+                    energy  = e0 + e1 + e2
+                    Erandn  = energy0 * laRn[g,f,j,i,0] + energy1 * laRn[g,f,j,i,1] + energy2 * laRn[g,f,j,i,2] + Ez
+
                     if val == 0:
                         if energy < 0:
-                            pass
-                            DeltaE = ez + energy - Ez - Erandn
+                            DeltaE = ez + energy - Erandn
                         else:
                             latt[g,f,j,i] *= -1
-                            DeltaE = ez - energy - Ez - Erandn
-                        if DeltaE < 0:
-                            pass
-                        else:
-                            latt[g,f,j,i] = laRn[g,f,j,i]
+                            DeltaE = ez - energy - Erandn
+                        if DeltaE > 0: latt[g,f,j,i] = laRn[g,f,j,i]
                     else:
-                        if energy < 0:
-                            if randvals[g,f,j,i] < np.exp( 2.0 * val * energy ):
-                                latt[g,f,j,i] *= -1
-                                DeltaE = ez - energy - Ez - Erandn
+                        if energy <  0:
+                            if e2 >= 0 or randvals[g,f,j,i] < np.exp( 2.0 * val * e2 ):
+                                latt[g,f,j,i,2] *= -1
+                                DeltaE = ez + e0 + e1 - e2 - Erandn
                             else:
-                                DeltaE = ez + energy - Ez - Erandn
+                                DeltaE = ez + energy - Erandn
                         else:
                             latt[g,f,j,i] *= -1
-                            DeltaE = ez - energy - Ez - Erandn
-                        if DeltaE < 0:
-                            if randvals[g,f,j,i] < np.exp( val * DeltaE ):
-                                latt[g,f,j,i] = laRn[g,f,j,i]
-                        else:
-                            latt[g,f,j,i] = laRn[g,f,j,i]
+                            DeltaE = ez - energy - Erandn
+
+                        if DeltaE >= 0 or randvals[g,f,j,i] < np.exp( val * DeltaE ): latt[g,f,j,i] = laRn[g,f,j,i]
 
                     nn_sum += ( -Ja * ( np.sign(latt[ga,fo,j   ,x__a,2]) + np.sign(latt[gb,fo,j   ,x__b,2]) + np.sign(latt[g ,fu,y__u,i   ,2]) + np.sign(latt[g ,fd,y__d,i   ,2]) ) -
                                  Jb * ( np.sign(latt[ga,f0,y__u,x__a,2]) + np.sign(latt[ga,f1,y__d,x__a,2]) + np.sign(latt[gb,f0,y__u,x__b,2]) + np.sign(latt[gb,f1,y__d,x__b,2]) ) -

@@ -99,16 +99,9 @@ def update3(latt, randvals, X_s, Y_s, Ja, Jb, Jc, val):
                     energy *= latt[g,f,j,i]
 
                     if val == 0:
-                        if energy < 0:
-                            pass
-                        else:
-                            latt[g,f,j,i] *= -1
+                        if energy >  0: latt[g,f,j,i] *= -1
                     else:
-                        if energy < 0:
-                            if randvals[g,f,j,i] < np.exp( 2.0 * val * energy ):
-                                latt[g,f,j,i] *= -1
-                        else:
-                            latt[g,f,j,i] *= -1
+                        if energy >= 0 or randvals[g,f,j,i] < np.exp( 2.0 * val * energy ): latt[g,f,j,i] *= -1
 
                     nn_sum += energy
     return nn_sum
