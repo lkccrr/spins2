@@ -7,7 +7,7 @@ def main():
                                      epilog='''
 configurations:       init:                                 parameters:             model:
 square                fm, afm1, afm2, afm3                  Ja, Jb, Jc              ising, single
-bilayer-ab            fm, afm1, afm2, afm3, afm4, afm5      J0, J1, Ja, J_1, J_a    ising, single
+bilayer-ab            fm, afm1, afm2, afm3, afm4, afm5      J0, J1, Ja, Jb, J0_     ising, single
 
 default values:
 x, y, z = 64, 64, 64

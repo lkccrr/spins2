@@ -3,7 +3,7 @@ import numpy as np
 from numba import njit, prange
 from spins2 import functions
 
-def iteration3(latt, X_s, Y_s, J0, J1, Ja, J_1, J_a, Aa, Ab, val, nequilibrium, nworks):
+def iteration3(latt, X_s, Y_s, J0, J1, Ja, Jb, J0_, Aa, Ab, val, nequilibrium, nworks):
     t0 = time.time()
     Nw = np.zeros((nworks, 2, 8))
     Ew = np.zeros(nworks)
@@ -12,13 +12,13 @@ def iteration3(latt, X_s, Y_s, J0, J1, Ja, J_1, J_a, Aa, Ab, val, nequilibrium, 
         randvals = np.random.rand(2, 8, Y_s, X_s)
         latZ = energy_A(latt, Aa, Ab)
         laRZ = energy_A(laRn, Aa, Ab)
-        E0   = update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, J_1, J_a, val)
+        E0   = update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, Jb, J0_, val)
     for i in range(nworks):
         laRn = functions.NormalrandNN(2, 8, Y_s, X_s)
         randvals = np.random.rand(2, 8, Y_s, X_s)
         latZ = energy_A(latt, Aa, Ab)
         laRZ = energy_A(laRn, Aa, Ab)
-        E0   = update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, J_1, J_a, val)
+        E0   = update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, Jb, J0_, val)
         Ew[i] = E0 / 2.0
         Nw[i,0] = functions.Average(latt[0,0,:,:,2]), functions.Average(latt[0,1,:,:,2]), functions.Average(latt[0,2,:,:,2]), functions.Average(latt[0,3,:,:,2]),\
                   functions.Average(latt[0,4,:,:,2]), functions.Average(latt[0,5,:,:,2]), functions.Average(latt[0,6,:,:,2]), functions.Average(latt[0,7,:,:,2])
@@ -47,7 +47,7 @@ def energy_A(latt, Aa, Ab):
             return ( Aa * L_x_2 + Ab * L_y_2 )
 
 @njit(cache=True, parallel=True)
-def update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, J_1, J_a, val):
+def update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, Jb, J0_, val):
     nn_sum = 0
     for f in prange(8):
         for g in range(2):
@@ -66,11 +66,27 @@ def update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, J_1, J_a, va
                         if f0 < 0: f0 = f0 + 8
                         x__a = i
                         x__b = i if f_2 == 1 else inn
+                        fi = 7 - f
+                        if f < 2:
+                            fj = 3 - f
+                            fl = f + 6
+                        else:
+                            fj = 11 -f
+                            fl = f - 2
+                        fk = f + 2
                     else:
                         f0 = f - 1
                         if f0 % 2 == 0: f0 = f0 - 2
                         x__a = i if f_2 == 0 else ipp
                         x__b = i
+                        fi = f - 2
+                        if f < 4:
+                            fj = f + 2
+                            fl = 3 - f
+                        else:
+                            fj = f - 6
+                            fl = 11 -f
+                        fk = 7 - f
 
                     f1 = f0 + 4 if f0      < 4 else f0 - 4
                     f2 = f1 - 1 if f1 % 2 == 1 else f1 + 1
@@ -94,6 +110,15 @@ def update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, J_1, J_a, va
                     else:
                         y__a = j
                         y__b = j
+
+                    if f < 4:
+                        fq  = f + 4
+                        y_A = jnn
+                        y_B = j
+                    else:
+                        fq  = f - 4
+                        y_A = j
+                        y_B = jpp
 
                     if g == 0:
                         x_0  = x_an
@@ -122,31 +147,40 @@ def update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, J_1, J_a, va
                         foc  = fo2 + 1 if fo2 % 2 == 0 else fo2 - 1
                         x_c  = ipp
 
-                    energy0 = ( -J0 * ( latt[go,f  ,j   ,i   ,0] + latt[go,fp ,j   ,x_0 ,0] +
-                                        latt[go,fo2,y__0,x__0,0] ) -
-                                 J1 *   latt[go,foa,y_1 ,x_1 ,0] -
-                                 J_1* ( latt[go,fob,y_b ,x_b ,0] + latt[go,foc,y__0,x_c ,0] ) -
+                    energy0 = ( -J0_* ( latt[go,f  ,j   ,i   ,0] + latt[go,fp ,j   ,x_0 ,0] ) -
+                                 J0 *   latt[go,fo2,y__0,x__0,0] -
+                                 J1 * ( latt[go,foa,y_1 ,x_1 ,0] +
+                                        latt[go,fob,y_b ,x_b ,0] + latt[go,foc,y__0,x_c ,0] ) -
                                  Ja * ( latt[g ,f0 ,y__a,x__a,0] + latt[g ,f3 ,y__a,x__b,0] +
-                                        latt[g ,f1 ,y__b,x__a,0] + latt[g ,f2 ,y__b,x__b,0] ) -
-                                 J_a* ( latt[g ,fp ,j   ,x_ap,0] + latt[g ,fp ,j   ,x_an,0] )
+                                        latt[g ,f1 ,y__b,x__a,0] + latt[g ,f2 ,y__b,x__b,0] +
+                                        latt[g ,fp ,j   ,x_ap,0] + latt[g ,fp ,j   ,x_an,0] ) -
+                                 Jb * ( latt[g ,fq ,y_A ,i   ,0] + latt[g ,fq ,y_B ,i   ,0] +
+                                        latt[g ,fi ,y__a,ipp ,0] + latt[g ,fl ,y__a,inn ,0] +
+                                        latt[g ,fj ,y__b,ipp ,0] + latt[g ,fk ,y__b,inn ,0] )
                               )
 
-                    energy1 = ( -J0 * ( latt[go,f  ,j   ,i   ,1] + latt[go,fp ,j   ,x_0 ,1] +
-                                        latt[go,fo2,y__0,x__0,1] ) -
-                                 J1 *   latt[go,foa,y_1 ,x_1 ,1] -
-                                 J_1* ( latt[go,fob,y_b ,x_b ,1] + latt[go,foc,y__0,x_c ,1] ) -
+                    energy1 = ( -J0_* ( latt[go,f  ,j   ,i   ,1] + latt[go,fp ,j   ,x_0 ,1] ) -
+                                 J0 *   latt[go,fo2,y__0,x__0,1] -
+                                 J1 * ( latt[go,foa,y_1 ,x_1 ,1] +
+                                        latt[go,fob,y_b ,x_b ,1] + latt[go,foc,y__0,x_c ,1] ) -
                                  Ja * ( latt[g ,f0 ,y__a,x__a,1] + latt[g ,f3 ,y__a,x__b,1] +
-                                        latt[g ,f1 ,y__b,x__a,1] + latt[g ,f2 ,y__b,x__b,1] ) -
-                                 J_a* ( latt[g ,fp ,j   ,x_ap,1] + latt[g ,fp ,j   ,x_an,1] )
+                                        latt[g ,f1 ,y__b,x__a,1] + latt[g ,f2 ,y__b,x__b,1] +
+                                        latt[g ,fp ,j   ,x_ap,1] + latt[g ,fp ,j   ,x_an,1] ) -
+                                 Jb * ( latt[g ,fq ,y_A ,i   ,1] + latt[g ,fq ,y_B ,i   ,1] +
+                                        latt[g ,fi ,y__a,ipp ,1] + latt[g ,fl ,y__a,inn ,1] +
+                                        latt[g ,fj ,y__b,ipp ,1] + latt[g ,fk ,y__b,inn ,1] )
                               )
 
-                    energy2 = ( -J0 * ( latt[go,f  ,j   ,i   ,2] + latt[go,fp ,j   ,x_0 ,2] +
-                                        latt[go,fo2,y__0,x__0,2] ) -
-                                 J1 *   latt[go,foa,y_1 ,x_1 ,2] -
-                                 J_1* ( latt[go,fob,y_b ,x_b ,2] + latt[go,foc,y__0,x_c ,2] ) -
+                    energy2 = ( -J0_* ( latt[go,f  ,j   ,i   ,2] + latt[go,fp ,j   ,x_0 ,2] ) -
+                                 J0 *   latt[go,fo2,y__0,x__0,2] -
+                                 J1 * ( latt[go,foa,y_1 ,x_1 ,2] +
+                                        latt[go,fob,y_b ,x_b ,2] + latt[go,foc,y__0,x_c ,2] ) -
                                  Ja * ( latt[g ,f0 ,y__a,x__a,2] + latt[g ,f3 ,y__a,x__b,2] +
-                                        latt[g ,f1 ,y__b,x__a,2] + latt[g ,f2 ,y__b,x__b,2] ) -
-                                 J_a* ( latt[g ,fp ,j   ,x_ap,2] + latt[g ,fp ,j   ,x_an,2] )
+                                        latt[g ,f1 ,y__b,x__a,2] + latt[g ,f2 ,y__b,x__b,2] +
+                                        latt[g ,fp ,j   ,x_ap,2] + latt[g ,fp ,j   ,x_an,2] ) -
+                                 Jb * ( latt[g ,fq ,y_A ,i   ,2] + latt[g ,fq ,y_B ,i   ,2] +
+                                        latt[g ,fi ,y__a,ipp ,2] + latt[g ,fl ,y__a,inn ,2] +
+                                        latt[g ,fj ,y__b,ipp ,2] + latt[g ,fk ,y__b,inn ,2] )
                               )
                     e0 = energy0 * latt[g,f,j,i,0]
                     e1 = energy1 * latt[g,f,j,i,1]
@@ -178,13 +212,16 @@ def update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, J_1, J_a, va
 
                         if DeltaE >= 0 or randvals[g,f,j,i] < np.exp( val * DeltaE ): latt[g,f,j,i] = laRn[g,f,j,i]
 
-                    nn_sum += ( -J0 * ( np.sign(latt[go,f  ,j   ,i   ,2]) + np.sign(latt[go,fp ,j   ,x_0 ,2]) +
-                                        np.sign(latt[go,fo2,y__0,x__0,2]) ) -
-                                 J1 *   np.sign(latt[go,foa,y_1 ,x_1 ,2]) -
-                                 J_1* ( np.sign(latt[go,fob,y_b ,x_b ,2]) + np.sign(latt[go,foc,y__0,x_c ,2]) ) -
+                    nn_sum += ( -J0_* ( np.sign(latt[go,f  ,j   ,i   ,2]) + np.sign(latt[go,fp ,j   ,x_0 ,2]) ) -
+                                 J0 *   np.sign(latt[go,fo2,y__0,x__0,2]) -
+                                 J1 * ( np.sign(latt[go,foa,y_1 ,x_1 ,2]) +
+                                        np.sign(latt[go,fob,y_b ,x_b ,2]) + np.sign(latt[go,foc,y__0,x_c ,2]) ) -
                                  Ja * ( np.sign(latt[g ,f0 ,y__a,x__a,2]) + np.sign(latt[g ,f3 ,y__a,x__b,2]) +
-                                        np.sign(latt[g ,f1 ,y__b,x__a,2]) + np.sign(latt[g ,f2 ,y__b,x__b,2]) ) -
-                                 J_a* ( np.sign(latt[g ,fp ,j   ,x_ap,2]) + np.sign(latt[g ,fp ,j   ,x_an,2]) )
+                                        np.sign(latt[g ,f1 ,y__b,x__a,2]) + np.sign(latt[g ,f2 ,y__b,x__b,2]) +
+                                        np.sign(latt[g ,fp ,j   ,x_ap,2]) + np.sign(latt[g ,fp ,j   ,x_an,2]) ) -
+                                 Jb * ( np.sign(latt[g ,fq ,y_A ,i   ,2]) + np.sign(latt[g ,fq ,y_B ,i   ,2]) +
+                                        np.sign(latt[g ,fi ,y__a,ipp ,2]) + np.sign(latt[g ,fl ,y__a,inn ,2]) +
+                                        np.sign(latt[g ,fj ,y__b,ipp ,2]) + np.sign(latt[g ,fk ,y__b,inn ,2]) )
                               ) * np.sign(latt[g,f,j,i,2])
 
     return nn_sum

@@ -24,18 +24,18 @@ def run(file, init, X, Y, J, arrays_temperatures, nequilibrium, nworks):
     lav = len(arrays_values)
     arrays_T2 = kB * arrays_values ** 2
     if p == 1:
-        J = [J[0], 0.0, 0.0, 0.0, 0.0]
+        J = [J[0], 0.0, 0.0, 0.0, J[0]]
     elif p == 2:
-        J = [J[0], J[1], 0.0, J[1], 0.0]
+        J = [J[0], J[1], 0.0, 0.0, J[0]]
     elif p == 3:
-        J = [J[0], J[1], J[2], J[1], J[2]]
+        J = [J[0], J[1], J[2], 0.0, J[0]]
     elif p == 4:
-        J = [J[0], J[1], J[2], J[3], J[2]]
+        J = [J[0], J[1], J[2], J[3], J[0]]
     else:
         J = [J[0], J[1], J[2], J[3], J[4]]
 
-    J0, J1, Ja, J_1, J_a = J[0], J[1], J[2], J[3], J[4]
-    logging.info("{} {:<8} {} {:<8} {:<8} {:<8} {:<8} {:<8}".format("init:", init, "parameters(meV):", J0, J1, Ja, J_1, J_a))
+    J0, J1, Ja, Jb, J0_ = J[0], J[1], J[2], J[3], J[4]
+    logging.info("{} {:<8} {} {:<8} {:<8} {:<8} {:<8} {:<8}".format("init:", init, "parameters(meV):", J0, J1, Ja, Jb, J0_))
     if init == "fm":
         logging.info("{:>16} {:>16}".format("Round", "magnetism"))
         latt = functions.Onesint4(2, 8, Y_s, X_s)
@@ -43,7 +43,7 @@ def run(file, init, X, Y, J, arrays_temperatures, nequilibrium, nworks):
         logging.info("{:>16} {:>16.6}".format(0, m_ave))
         logging.info("{:>16} {:>16} {:>16} {:>16} {:>16}".format("Temperature", "magnetism", "susceptibility", "specific heat", "time(s)"))
         for i in range(lav):
-            t, Nw, Ew = bilayer_ab_update.iteration3(latt, X_s, Y_s, J0, J1, Ja, J_1, J_a, arrays_values[i], nequilibrium, nworks)
+            t, Nw, Ew = bilayer_ab_update.iteration3(latt, X_s, Y_s, J0, J1, Ja, Jb, J0_, arrays_values[i], nequilibrium, nworks)
             m_ave = functions.Average(Nw)
             s_ave = functions.Average2(Nw)
             susceptibility = arrays_values[i] * num * (s_ave - m_ave ** 2)
@@ -59,7 +59,7 @@ def run(file, init, X, Y, J, arrays_temperatures, nequilibrium, nworks):
         logging.info("{:>16} {:>16} {:>16} {:>16} {:>16} {:>16} {:>16}".format(
             "Temperature", "magnetism0", "magnetism1", "susceptibility0", "susceptibility1", "specific heat", "time(s)"))
         for i in range(lav):
-            t, Nw, Ew = bilayer_ab_update.iteration3(latt, X_s, Y_s, J0, J1, Ja, J_1, J_a, arrays_values[i], nequilibrium, nworks)
+            t, Nw, Ew = bilayer_ab_update.iteration3(latt, X_s, Y_s, J0, J1, Ja, Jb, J0_, arrays_values[i], nequilibrium, nworks)
             arr_a, arr_b = Nw[:,0], Nw[:,1]
             m_ave0 = functions.Average(arr_a)
             m_ave1 = functions.Average(arr_b)
@@ -80,7 +80,7 @@ def run(file, init, X, Y, J, arrays_temperatures, nequilibrium, nworks):
         logging.info("{:>16} {:>16} {:>16} {:>16} {:>16} {:>16} {:>16}".format(
             "Temperature", "magnetism0", "magnetism1", "susceptibility0", "susceptibility1", "specific heat", "time(s)"))
         for i in range(lav):
-            t, Nw, Ew = bilayer_ab_update.iteration3(latt, X_s, Y_s, J0, J1, Ja, J_1, J_a, arrays_values[i], nequilibrium, nworks)
+            t, Nw, Ew = bilayer_ab_update.iteration3(latt, X_s, Y_s, J0, J1, Ja, Jb, J0_, arrays_values[i], nequilibrium, nworks)
             arr_a = Nw[:,:,[0,1,4,5]]
             arr_b = Nw[:,:,[2,3,6,7]]
             m_ave0 = functions.Average(arr_a)
@@ -103,7 +103,7 @@ def run(file, init, X, Y, J, arrays_temperatures, nequilibrium, nworks):
         logging.info("{:>16} {:>16} {:>16} {:>16} {:>16} {:>16} {:>16}".format(
             "Temperature", "magnetism0", "magnetism1", "susceptibility0", "susceptibility1", "specific heat", "time(s)"))
         for i in range(lav):
-            t, Nw, Ew = bilayer_ab_update.iteration3(latt, X_s, Y_s, J0, J1, Ja, J_1, J_a, arrays_values[i], nequilibrium, nworks)
+            t, Nw, Ew = bilayer_ab_update.iteration3(latt, X_s, Y_s, J0, J1, Ja, Jb, J0_, arrays_values[i], nequilibrium, nworks)
             arr_a = np.append(Nw[:,0,[0,1,4,5]], Nw[:,1,[2,3,6,7]])
             arr_b = np.append(Nw[:,0,[2,3,6,7]], Nw[:,1,[0,1,4,5]])
             m_ave0 = functions.Average(arr_a)
@@ -125,7 +125,7 @@ def run(file, init, X, Y, J, arrays_temperatures, nequilibrium, nworks):
         logging.info("{:>16} {:>16} {:>16} {:>16} {:>16} {:>16} {:>16}".format(
             "Temperature", "magnetism0", "magnetism1", "susceptibility0", "susceptibility1", "specific heat", "time(s)"))
         for i in range(lav):
-            t, Nw, Ew = bilayer_ab_update.iteration3(latt, X_s, Y_s, J0, J1, Ja, J_1, J_a, arrays_values[i], nequilibrium, nworks)
+            t, Nw, Ew = bilayer_ab_update.iteration3(latt, X_s, Y_s, J0, J1, Ja, Jb, J0_, arrays_values[i], nequilibrium, nworks)
             arr_a = Nw[:,:,[0,3,4,7]]
             arr_b = Nw[:,:,[1,2,5,6]]
             m_ave0 = functions.Average(arr_a)
@@ -148,7 +148,7 @@ def run(file, init, X, Y, J, arrays_temperatures, nequilibrium, nworks):
         logging.info("{:>16} {:>16} {:>16} {:>16} {:>16} {:>16} {:>16}".format(
             "Temperature", "magnetism0", "magnetism1", "susceptibility0", "susceptibility1", "specific heat", "time(s)"))
         for i in range(lav):
-            t, Nw, Ew = bilayer_ab_update.iteration3(latt, X_s, Y_s, J0, J1, Ja, J_1, J_a, arrays_values[i], nequilibrium, nworks)
+            t, Nw, Ew = bilayer_ab_update.iteration3(latt, X_s, Y_s, J0, J1, Ja, Jb, J0_, arrays_values[i], nequilibrium, nworks)
             arr_a  = np.append(Nw[:,0,[0,2,4,6]], Nw[:,1,[0,3,4,7]])
             arr_b  = np.append(Nw[:,0,[1,3,5,7]], Nw[:,1,[1,2,5,6]])
             m_ave0 = functions.Average(arr_a)
