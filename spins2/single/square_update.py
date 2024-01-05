@@ -57,10 +57,10 @@ def update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, Ja, Jb, Jc, val):
                     inn  = (i - 1) if (i - 1) > -1  else (X_s - 1)
                     jpp  = (j + 1) if (j + 1) < Y_s else 0
                     jnn  = (j - 1) if (j - 1) > -1  else (Y_s - 1)
-                    go   = 1  - g
-                    f_2  = f  % 2
-                    fp   = f  + 1
-                    fn   = f  - 1
+                    go   =  1 - g
+                    f_2  =  f % 2
+                    fp   =  f + 1
+                    fn   =  f - 1
 
                     if g == 0:
                         x__o = i

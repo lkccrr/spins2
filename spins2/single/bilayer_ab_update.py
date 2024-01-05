@@ -57,9 +57,9 @@ def update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, Jb, J1_, val
                     inn  = (i - 1) if (i - 1) > -1  else (X_s - 1)
                     jpp  = (j + 1) if (j + 1) < Y_s else 0
                     jnn  = (j - 1) if (j - 1) > -1  else (Y_s - 1)
-                    go   = 1  - g
-                    f_4  = f  % 4
-                    f_2  = f  % 2
+                    go   =  1 - g
+                    f_4  =  f % 4
+                    f_2  =  f % 2
 
                     if f_4 < 2:
                         f0 = f - 2
@@ -68,11 +68,11 @@ def update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, Jb, J1_, val
                         x__b = i if f_2 == 1 else inn
                         fi = 7 - f
                         if f < 2:
-                            fj = 3 - f
-                            fl = f + 6
+                            fj = 3  - f
+                            fl = f  + 6
                         else:
-                            fj = 11 -f
-                            fl = f - 2
+                            fj = 11 - f
+                            fl = f  - 2
                         fk = f + 2
                     else:
                         f0 = f - 1
@@ -81,11 +81,11 @@ def update3(latt, latZ, laRn, laRZ, randvals, X_s, Y_s, J0, J1, Ja, Jb, J1_, val
                         x__b = i
                         fi = f - 2
                         if f < 4:
-                            fj = f + 2
-                            fl = 3 - f
+                            fj = f  + 2
+                            fl = 3  - f
                         else:
-                            fj = f - 6
-                            fl = 11 -f
+                            fj = f  - 6
+                            fl = 11 - f
                         fk = 7 - f
 
                     f1 = f0 + 4 if f0      < 4 else f0 - 4
