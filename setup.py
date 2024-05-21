@@ -5,7 +5,7 @@ setup(
     name='spins2',
     version=__version__,
     author='kan',
-    author_email='luo_kan+pypi@outlook.com',
+    author_email='luokan@mail.ecust.edu.cn',
     python_requires=">=3.8",
     license='MIT',
     license_files=('LICENSE.txt',),
@@ -29,7 +29,7 @@ setup(
     install_requires=[
         'numba>=0.54.0',
         'numpy>=1.22.0',
-        'matplotlib>=3.4.0'
+        'matplotlib>=3.6.0'
     ],
     entry_points={
         'console_scripts': ['spins2=spins2.wrapper:main']
