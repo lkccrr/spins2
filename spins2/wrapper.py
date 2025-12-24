@@ -10,6 +10,7 @@ square                fm, afm1, afm2, afm3                  Ja, Jb, Jc
 triangular            fm, afm1, afm2, afm3                  Ja, Jb, Jc
 bilayer-aa            fm, afm1, afm2, afm3                  J0, J1, Ja
 bilayer-ab            fm, afm1, afm2, afm3, afm4, afm5      J0, J1, Ja, Jb, J1_
+bilayer-ab-u-3        fm, afm1, afm2, afm3                  J0, J1, Ja
 
 default values:
 x, y, z = 64, 64, 64
@@ -39,7 +40,7 @@ spins2 -x 100 -y 100 -e 2000 -w 5000 -n 8 -t 35 -r
     parser.add_argument('-o', "--plot",         type=str,                  help="日志文件绘图")
     parser.add_argument('-f', "--format",       default="png",             type=str.lower, choices=['png', 'pdf', 'svg', 'jpg', 'tif'])
     parser.add_argument('-i', "--init",         default="fm",              type=str.lower, choices=['fm', 'afm1', 'afm2','afm3', 'afm4', 'afm5', 'random'])
-    parser.add_argument('-c', "--config",       default="square",          type=str.lower, choices=['square', 'triangular', 'bilayer-ab', 'bilayer-aa'])
+    parser.add_argument('-c', "--config",       default="square",          type=str.lower, choices=['square', 'triangular', 'bilayer-aa', 'bilayer-ab', 'bilayer-ab-u-3'])
     args = parser.parse_args()
 
     NP = args.np
@@ -83,6 +84,10 @@ spins2 -x 100 -y 100 -e 2000 -w 5000 -n 8 -t 35 -r
                 file = '{}_single_{}_{}.log'.format(config, X, Y)
                 from spins2.single import bilayer_ab
                 bilayer_ab.run(file, init, X, Y, J, A, arrays_temperatures, nequilibrium, nworks)
+            elif config == "bilayer-ab-u-3":
+                file = '{}_single_{}_{}.log'.format(config, X, Y)
+                from spins2.single import bilayer_ab_u_3
+                bilayer_ab_u_3.run(file, init, X, Y, J, A, arrays_temperatures, nequilibrium, nworks)
             else:
                 print("Inconsistent parameters...")
         else:
@@ -102,6 +107,10 @@ spins2 -x 100 -y 100 -e 2000 -w 5000 -n 8 -t 35 -r
                 file = '{}_Ising_{}_{}.log'.format(config, X, Y)
                 from spins2.ising import bilayer_ab
                 bilayer_ab.run(file, init, X, Y, J, arrays_temperatures, nequilibrium, nworks)
+            elif config == "bilayer-ab-u-3":
+                file = '{}_Ising_{}_{}.log'.format(config, X, Y)
+                from spins2.ising import bilayer_ab_u_3
+                bilayer_ab_u_3.run(file, init, X, Y, J, arrays_temperatures, nequilibrium, nworks)
             else:
                 print("Inconsistent parameters...")
 
