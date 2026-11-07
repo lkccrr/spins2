@@ -1,0 +1,131 @@
+name: Release to PyPI
+
+# Publishing runs when a GitHub Release is published
+# (tag the commit -> "Create a new release" -> publish).
+# A manual run from the Actions tab publishes the selected branch as it is.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Required: the OIDC token used by PyPI Trusted Publishing (and by the
+  # PEP 740 attestations below). Without it the publish step fails with
+  # "ACTIONS_ID_TOKEN_REQUEST_TOKEN environment variable was unset".
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build sdist + wheel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools
+        run: python -m pip install --upgrade pip build twine
+
+      - name: Check that the versions agree
+        shell: python
+        run: |
+          import os, pathlib, re, sys
+
+          init = pathlib.Path("spins2/__init__.py").read_text(encoding="utf-8")
+          version = re.search(r'^__version__\s*=\s*"([^"]+)"', init, re.M).group(1)
+
+          print(f"spins2/__init__.py: {version}")
+
+          if os.environ.get("GITHUB_EVENT_NAME") == "release":
+              tag = os.environ["GITHUB_REF_NAME"].lstrip("v")
+              print(f"git tag       : {tag}")
+              if tag != version:
+                  sys.exit(
+                      f"version mismatch: the release tag is {tag} but the package "
+                      f"version is {version}.\n"
+                      f"Fix one of them and publish again:\n"
+                      f"  * tag the same commit as {version} "
+                      f"(git tag -f {version} && git push origin {version}) "
+                      f"and create a release for that tag, or\n"
+                      f"  * bump __version__ in spins2/__init__.py to {tag} "
+                      f"and re-tag the commit as {tag}.")
+
+      - name: Build sdist + wheel
+        run: python -m build
+
+      - name: Validate package metadata
+        run: python -m twine check --strict dist/*
+
+      - name: Show built artefacts
+        run: ls -la dist/
+
+      - name: Upload dist as artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/*
+          if-no-files-found: error
+
+  smoke-test:
+    name: Smoke-test the deprecation shim
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Install the wheel
+        run: python -m pip install --upgrade dist/*.whl
+
+      - name: Import must fail with the migration hint
+        run: |
+          set +e
+          python -c "import spins2" > import.log 2>&1
+          status=$?
+          set -e
+          cat import.log
+          test "$status" -ne 0
+          grep -q "mcta" import.log
+
+      - name: The replacement CLI must be installed
+        run: mt -V
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: [build, smoke-test]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/spins2
+    steps:
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          # PEP 740 attestations (the provenance badge on the PyPI page)
+          attestations: true
+          # Trusted Publishing (OIDC) for the "spins2" project on PyPI:
+          # no API token needed, the id-token permission above is enough
